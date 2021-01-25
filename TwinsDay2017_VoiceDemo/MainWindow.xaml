@@ -1,0 +1,989 @@
+﻿<Window x:Class="TwinsDay2017_VoiceDemo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        xmlns:src="clr-namespace:TwinsDay2017_VoiceDemo"
+        Title="WVU Biometrics Voice Verfication and Identification"
+        Height="800" Width="1200" Closing="Window_Closing" MouseDown="Window_MouseDown" Background="#EAAA00">
+    <!-- Colors I was testing with: #B39013* #8F701E #7C736A -->
+
+    <Grid Name="MainGrid" Margin ="20,10,10,10" Background="#193D66" Focusable="True" FocusVisualStyle="{x:Null}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- TABS -->
+        <TabControl Margin="5" BorderBrush="Gainsboro" SelectionChanged="TabControl_SelectionChanged" Grid.ColumnSpan="2">
+            
+            <!-- START OF IDENTIFICATION SECTION -->
+            <TabItem Margin="0,0,0,2.5" Height="50" x:Name="IdentifyTab">
+                <TabItem.Header>
+                    <Label Content="Identification"/>
+                </TabItem.Header>
+
+                <!-- All the Content in the Identification Page  -->
+                <Border Margin="-5" BorderThickness="3" BorderBrush="#2C2A29" Background="#002855">
+                    <Grid Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- The Left Side of the Identification Page -->
+                        <DockPanel LastChildFill="True" Grid.Column="0">
+
+                            <!-- The Probe Audio File Import Components -->
+                            <Border DockPanel.Dock="Top" BorderThickness="2,2,2,3" BorderBrush="#6E6259">
+                                
+                                <Grid Background="LightGray">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- The Probe Image File Import Components -->
+                                    <DockPanel Grid.Row="2" LastChildFill="True">
+                                        <Button Name ="IdentifyImport" Click="ImportFile" Width="100" Height="28"  Margin="3" VerticalAlignment="Top" DockPanel.Dock="Right">
+                                            <Image Height="24">
+                                                <Image.Source>
+                                                    <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/FolderPlus.png"/>
+                                                </Image.Source>
+                                            </Image>
+                                        </Button>
+                                        <TextBox Name ="IdentificationImportPath" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="28"  Margin="3"/>
+                                    </DockPanel>
+
+                                    <DockPanel Grid.Row="0" LastChildFill="True">
+                                        <Button Name ="IdentifyScan" Content="Scan" Click="IdentifyScan_Click" Width="100" Height="28"  Margin="3" VerticalAlignment="Top" DockPanel.Dock="Right"/>
+                                        <TextBox Name ="IdentificationScanPath" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="28"  Margin="3" KeyDown="IdentifyScanPath_KeyDown"/>
+                                    </DockPanel>
+
+                                    <DockPanel Grid.Row="1">
+                                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                                            <Button Name="IdentifySelect" Content="Select" Click="IdentifySelect_Click" Width="60" Height="25" Margin="3" IsEnabled="False"/>
+                                            <Button Name="IdentifyDeselect" Content="Deselect" Click="IdentifyDeselect_Click" Width="60" Height="25" Margin="3" IsEnabled="False"/>
+                                        </StackPanel>
+
+                                        <ComboBox Name="IdentifyVoiceSelect" Text="Select Image..." Margin="3" IsEnabled="False" SelectionChanged="IdentifyVoiceSelect_SelectionChanged"/>
+                                    </DockPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- All of the Identification Buttons -->
+                            <DockPanel DockPanel.Dock="Bottom" Background="#325276">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" DockPanel.Dock="Bottom" Height="40" Margin="0,0,0,5">
+                                    <Button Name="IdentificationClearWindow" Content="Clear" Width="62" Margin="0,0,5,0" Click="IdentificationClearWindow_Click" FontSize="16" IsEnabled="False"/>
+                                    <Button Name="IdentificationReset" Content="Reset" Width="62" Margin="5,0,0,0" Click="IdentificationReset_Click" FontSize="16" IsEnabled="False"/>
+                                </StackPanel>
+                                <Button Name="GenerateMatches" Content="Generate Matches" Height="52" Click="GenerateMatches_Click" Margin="3" FontSize="18" IsEnabled="False"/>
+                            </DockPanel>
+
+                            <Border BorderThickness="2,0,2,2" BorderBrush="#6E6259">
+                                <DockPanel LastChildFill="True">
+
+                                    <!-- Identification Probe Audio Player -->
+                                    <Grid Background="#807F7E">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <DockPanel Grid.Row="0" VerticalAlignment="Center" Background="#565453">
+
+                                            <Label Name="IdentificationRID" Content="---" FontSize="16" DockPanel.Dock="Top" HorizontalContentAlignment="Center" Foreground="LightGray"/>
+                                            <Label Name="IdentificationPlayerStatus" Content="No File Loaded" FontSize="16" FontStyle="Italic" DockPanel.Dock="Top" HorizontalContentAlignment="Center" Foreground="LightGray"/>
+
+                                            <!-- The Playback Controls -->
+                                            <WrapPanel HorizontalAlignment="Center" DockPanel.Dock="Bottom" Margin="0,0,0,10">
+                                                <Button Name="IdentPlay" Width="52" Height="35" Click="IdentPlay_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Play.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                                <Button Name="IdentPause" Margin="10,0" Width="55" Height="35" Click="IdentPause_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Pause.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                                <Button Name="IdentStop" Width="51" Height="35" Click="IdentStop_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Stop.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                            </WrapPanel>
+
+                                            <Slider Name="IdentTime" Margin="10,5" Thumb.DragStarted="IdentTime_DragStarted" Thumb.DragCompleted="IdentTime_DragCompleted" IsMoveToPointEnabled="False"/>
+                                        </DockPanel>
+
+                                        <DockPanel Grid.Row="1" VerticalAlignment="Center" Background="#565453">
+                                            <Label Name="ResultRID" Content="---" FontSize="16" DockPanel.Dock="Top" HorizontalContentAlignment="Center" Foreground="LightGray"/>
+                                            <Label Name="ResultPlayerStatus" Content="No Result Loaded" FontSize="16" FontStyle="Italic" DockPanel.Dock="Top" HorizontalContentAlignment="Center" Foreground="LightGray"/>
+
+                                            <!-- The Playback Controls -->
+                                            <WrapPanel HorizontalAlignment="Center" DockPanel.Dock="Bottom" Margin="0,0,0,10">
+                                                <Button Name="ResultPlay" Width="52" Height="35" Click="ResultPlay_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Play.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                                <Button Name="ResultPause" Margin="10,0" Width="55" Height="35" Click="ResultPause_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Pause.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                                <Button Name="ResultStop" Width="51" Height="35" Click="ResultStop_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Stop.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                            </WrapPanel>
+
+                                            <Slider Name="ResultTime" Margin="10,5" Thumb.DragStarted="ResultTime_DragStarted" Thumb.DragCompleted="ResultTime_DragCompleted"/>
+                                        </DockPanel>
+                                    </Grid>
+                                </DockPanel>
+                            </Border>
+                        </DockPanel>
+
+                        <!-- The Right Side of the Identification Page -->
+                        <DockPanel LastChildFill="True" Grid.Column="1" Margin="20,0,0,0">
+
+                            <Border DockPanel.Dock="Top" Width="500" Margin="0,10,0,0" BorderThickness="2" BorderBrush="#6E6259" Background="#D0D4D6">
+                                <!-- Label Above the ListBox -->
+                                <Label Content="Top Matches:" FontSize="16" HorizontalAlignment="Center" DockPanel.Dock="Top" Margin="0,3,3,0" FontWeight="Black" FontStyle="Italic"/>
+                            </Border>
+
+                            <!-- The Progress Bar -->
+                            <Grid DockPanel.Dock="Bottom" Margin="3">
+                                <DockPanel>
+                                    <TextBox Name="IdentStatusInfo" DockPanel.Dock="Bottom" Text="Progress: " Height="25" Background="GhostWhite"
+                                             VerticalContentAlignment="Center" IsReadOnlyCaretVisible="False" IsReadOnly="True" FontWeight="Black" FontStyle="Italic"/>
+                                    <ProgressBar Name="IdentificationStatus" Minimum="0" Maximum="100" Value="0" Height="35" />
+                                </DockPanel>
+                            </Grid>
+
+                            <!-- The Top Match ListBox -->
+                            <ListBox Name="TopMatchList" ItemsSource="{Binding}" Style="{StaticResource resultListStyle}"
+                                     BorderBrush="#6E6259" BorderThickness="2" Margin="3" Background="GhostWhite"
+                                     ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible">
+
+                                <!-- The Template Definition for Each Item in the ListBox -->
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel Margin="3" x:Name="MatchItem" RequestBringIntoView="ResultViewHandler">
+
+                                            <Grid DockPanel.Dock="Left">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition MinWidth="50"/>
+                                                    <ColumnDefinition Width="60"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- The Rank # -->
+                                                <TextBlock Grid.Column="0" Margin="5,0" FontWeight="Bold" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Path=Rank, StringFormat=#{0}}"/>
+
+                                                <!-- Load Result Audio Button -->
+                                                <Button Grid.Column="1" Height="40" Width="50" Click="LoadResult_Click" Tag="{Binding Path=Rank}">
+                                                    <TextBlock>Load<LineBreak/>Audio</TextBlock>
+                                                </Button>
+
+                                                <!-- Image -->
+                                                <Button Grid.Column="2" Cursor="Hand" MouseDoubleClick="OpenImage_Click" Tag="{Binding Path=Rank}">
+                                                    <Image MaxHeight="165" Source="{Binding Path=Image}"/>
+                                                </Button>
+                                            </Grid>
+
+                                            <!-- All of the Textual Information -->
+                                            <Grid Margin="10,0">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="*"/>
+                                                </Grid.RowDefinitions>
+
+                                                <!-- The Info (RID/Score/Probability) -->
+                                                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Margin="0" FontSize="16" FontWeight="Bold" FontStyle="Italic" Text="RID: "/>
+                                                    <TextBlock Margin="0" FontSize="16" Text="{Binding Path=ID}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Margin="0" FontSize="16" FontWeight="Bold" FontStyle="Italic" Text="Score: "/>
+                                                    <TextBlock Margin="0" FontSize="16" Text="{Binding Path=Score}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Margin="0" FontSize="16" FontWeight="Bold" FontStyle="Italic" Text="False Acceptance Rate: "/>
+                                                    <TextBlock Margin="0" FontSize="16" Text="{Binding Path=FAR, StringFormat='{}{0:0.####}%'}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Margin="0" FontSize="16" FontWeight="Bold" FontStyle="Italic" Text="False Acceptance Probability: "/>
+                                                    <TextBlock Margin="0" FontSize="16" Text="{Binding Path=Probability, StringFormat='{}{0:0.####}%'}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <!-- Sets the text of selected items to remain black -->
+                                                <Setter Property="Foreground" Value="Black"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                            </ListBox>
+                        </DockPanel>
+                    </Grid>
+                </Border>
+            </TabItem>
+            <!-- END OF IDENTIFICATION SECTION -->
+
+            <!-- START OF VERIFICATION (1:1) SECTION -->
+            <TabItem Margin="0,2.5" Height="50" x:Name="VerifyTab">
+                <TabItem.Header>
+                    <Label Content="Verify 1:1"/>
+                </TabItem.Header>
+
+                <!-- All the Content in the Verification Page -->
+                <Border Margin="-5" BorderThickness="3" BorderBrush="#2C2A29" Background="#002855">
+                    <Grid Margin="4">
+                        <!-- Overall Layout Definitions -->
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*" MinWidth="250"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- The Left Portion of the Verification Page -->
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <!-- All of the Top Audio Components -->
+                            <DockPanel Grid.Row="0" LastChildFill="True" Margin="0,3">
+
+                                <!-- The Top Audio File Import -->
+                                <Border DockPanel.Dock="Top" BorderThickness="2" BorderBrush="#6E6259">
+                                    <Grid Background="LightGray">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- The Left Image File Import -->
+                                        <DockPanel Grid.Row="2" LastChildFill="True">
+                                            <Button Name="VerificationImportTop" DockPanel.Dock="Right" Height="30" Width="100" Margin="3" Click="VerificationImportTop_Click">
+                                                <Image Height="24">
+                                                    <Image.Source>
+                                                        <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/FolderPlus.png"/>
+                                                    </Image.Source>
+                                                </Image>
+                                            </Button>
+                                            <TextBox Name="VerificationImportPathTop" Margin="3" VerticalContentAlignment="Center"/>
+                                        </DockPanel>
+
+                                        <DockPanel Grid.Row="0" LastChildFill="True">
+                                            <Button Name ="TopScan" Content="Scan" Click="TopScan_Click" Width="100" Height="28"  Margin="3" VerticalAlignment="Top" DockPanel.Dock="Right"/>
+                                            <TextBox Name ="TopScanPath" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="28"  Margin="3" KeyDown="TopScanPath_KeyDown"/>
+                                        </DockPanel>
+
+                                        <DockPanel Grid.Row="1">
+                                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                                                <Button Name="TopSelect" Content="Select" Click="TopSelect_Click" Width="60" Height="25" Margin="3" IsEnabled="False"/>
+                                                <Button Name="TopDeselect" Content="Deselect" Click="TopDeselect_Click" Width="60" Height="25" Margin="3" IsEnabled="False"/>
+                                            </StackPanel>
+
+                                            <ComboBox Name="TopVoiceSelect" Text="Select Voice..." Margin="3" IsEnabled="False" SelectionChanged="TopVoiceSelect_SelectionChanged"/>
+                                        </DockPanel>
+                                    </Grid>
+                                </Border>
+
+                                <Border BorderThickness="2,0,2,2" BorderBrush="#6E6259">
+                                    <Grid Background="#807F7E">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Top Audio Player -->
+                                        <DockPanel Grid.Row="0" Background="#565453" VerticalAlignment="Center">
+
+                                            <Label Name="TopRID" Content="---" FontSize="16" DockPanel.Dock="Top" HorizontalContentAlignment="Center" Foreground="LightGray"/>
+                                            <Label Name="TopPlayerStatus" Content="No File Loaded" FontSize="16" FontStyle="Italic" DockPanel.Dock="Top" HorizontalContentAlignment="Center" Foreground="LightGray"/>
+
+                                            <!-- The Playback Controls -->
+                                            <WrapPanel HorizontalAlignment="Center" DockPanel.Dock="Bottom" Margin="0,0,0,10">
+                                                <Button Name="TopPlay" Width="52" Height="35" Click="TopPlay_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Play.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                                <Button Name="TopPause" Margin="10,0" Width="55" Height="35" Click="TopPause_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Pause.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                                <Button Name="TopStop" Width="51" Height="35" Click="TopStop_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Stop.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                            </WrapPanel>
+
+                                            <Slider Name="TopTime" Margin="10,5" Thumb.DragStarted="TopTime_DragStarted" Thumb.DragCompleted="TopTime_DragCompleted"/>
+                                        </DockPanel>
+                                    </Grid>
+                                </Border>
+                            </DockPanel>
+
+                            <!-- All of the Bottom Audio Components -->
+                            <DockPanel Grid.Row="1" LastChildFill="True" Margin="0,3" >
+
+                                <!-- The Bottom Audio File Import -->
+                                <Border DockPanel.Dock="Top" BorderThickness="2" BorderBrush="#6E6259">
+                                    <Grid Background="LightGray">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- The Left Image File Import -->
+                                        <DockPanel Grid.Row="2" LastChildFill="True">
+                                            <Button Name="VerificationImportBottom" DockPanel.Dock="Right" Height="30" Width="100" Margin="3" Click="VerificationImportBottom_Click">
+                                                <Image Height="24">
+                                                    <Image.Source>
+                                                        <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/FolderPlus.png"/>
+                                                    </Image.Source>
+                                                </Image>
+                                            </Button>
+                                            <TextBox Name="VerificationImportPathBottom" Margin="3" VerticalContentAlignment="Center"/>
+                                        </DockPanel>
+
+                                        <DockPanel Grid.Row="0" LastChildFill="True">
+                                            <Button Name ="BottomScan" Content="Scan" Click="BottomScan_Click" Width="100" Height="28"  Margin="3" VerticalAlignment="Top" DockPanel.Dock="Right"/>
+                                            <TextBox Name ="BottomScanPath" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="28" Margin="3" KeyDown="BottomScanPath_KeyDown"/>
+                                        </DockPanel>
+
+                                        <DockPanel Grid.Row="1">
+                                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                                                <Button Name="BottomSelect" Content="Select" Click="BottomSelect_Click" Width="60" Height="25" Margin="3" IsEnabled="False"/>
+                                                <Button Name="BottomDeselect" Content="Deselect" Click="BottomDeselect_Click" Width="60" Height="25" Margin="3" IsEnabled="False"/>
+                                            </StackPanel>
+
+                                            <ComboBox Name="BottomVoiceSelect" Text="Select Voice..." Margin="3" IsEnabled="False" SelectionChanged="BottomVoiceSelect_SelectionChanged"/>
+                                        </DockPanel>
+                                    </Grid>
+                                </Border>
+
+                                <Border BorderThickness="2,0,2,2" BorderBrush="#6E6259">
+                                    <Grid Background="#807F7E">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Bottom Audio Player -->
+                                        <DockPanel Grid.Row="0" Background="#565453" VerticalAlignment="Center">
+
+                                            <Label Name="BottomRID" Content="---" FontSize="16" DockPanel.Dock="Top" HorizontalContentAlignment="Center" Foreground="LightGray"/>
+                                            <Label Name="BottomPlayerStatus" Content="No File Loaded" FontSize="16" FontStyle="Italic" DockPanel.Dock="Top" HorizontalContentAlignment="Center" Foreground="LightGray"/>
+
+                                            <!-- The Playback Controls -->
+                                            <WrapPanel HorizontalAlignment="Center" DockPanel.Dock="Bottom" Margin="0,0,0,10">
+                                                <Button Name="BottomPlay" Width="52" Height="35" Click="BottomPlay_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Play.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                                <Button Name="BottomPause" Margin="10,0" Width="55" Height="35" Click="BottomPause_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Pause.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                                <Button Name="BottomStop" Width="51" Height="35" Click="BottomStop_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Stop.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                            </WrapPanel>
+
+                                            <Slider Name="BottomTime" Margin="10,5" Thumb.DragStarted="BottomTime_DragStarted" Thumb.DragCompleted="BottomTime_DragCompleted"/>
+                                        </DockPanel>
+                                    </Grid>
+                                </Border>
+                            </DockPanel>
+                        </Grid>
+
+                        <!-- Results Panel -->
+                        <DockPanel Grid.Column="1" Margin="3" LastChildFill="True">
+
+                            <DockPanel DockPanel.Dock="Top" Background="#325276">
+                                <Grid DockPanel.Dock="Top" Margin="5,5" Background="#A2AAAD">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Extraction Options -->
+                                    <Label Grid.Row="0" Content="Extraction Options: " FontSize="14" FontStyle="Italic" FontWeight="SemiBold"/>
+                                    <Image Grid.Row="0" Source="Icon Images/Small/Info.png" Height="16" Cursor="Help" HorizontalAlignment="Right" Margin="10,0"
+                                           ToolTipService.InitialShowDelay="1000" ToolTipService.ShowDuration="10000"
+                                           ToolTipService.BetweenShowDelay="2000" ToolTipService.IsEnabled="True">
+                                        <Image.ToolTip>
+                                            <ToolTip Width="350">
+                                                <TextBlock TextWrapping="Wrap">
+                                                    Extraction options must be selected before importing or scanning in any subjects.
+                                                    If you have created a subject, you must clear all (both top and bottom subject)
+                                                    before being able to alter extraction options.
+                                                </TextBlock>
+                                            </ToolTip>
+                                        </Image.ToolTip>
+                                    </Image>
+
+                                    <DockPanel Grid.Row="1" LastChildFill="True" Margin="15,0">
+                                        <CheckBox Name="TextDependentCheck" DockPanel.Dock="Left" VerticalAlignment="Center" IsChecked="True"/>
+                                        <Label Content="Text-Dependent"/>
+                                    </DockPanel>
+                                    <DockPanel Grid.Row="2" LastChildFill="True" Margin="15,0">
+                                        <CheckBox Name="TextIndependentCheck" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                                        <Label Content="Text-Independent"/>
+                                    </DockPanel>
+
+                                    <!-- Verification Options -->
+                                    <Label Grid.Row="3" Content="Verification Options:" FontSize="14" FontStyle="Italic" FontWeight="SemiBold"/>
+                                    <DockPanel Grid.Row="4" LastChildFill="True" Margin="15,0">
+                                        <CheckBox Name="UniqueCheck" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                                        <Label Content="Unique Phrases Only"/>
+                                    </DockPanel>
+                                </Grid>
+
+                                <!-- The Main Verification Button -->
+                                <Button Name="VerifyVoices" Content="Verify" Margin="3" DockPanel.Dock="Top" Click="Verification_Click" IsEnabled="False" Height="40" FontSize="18"/>
+                            </DockPanel>
+
+                            <!-- All of the Buttons on the Bottom -->
+                            <StackPanel  DockPanel.Dock="Bottom" Margin="0,2.5,0,0" Background="#325276">
+
+                                <!-- Collapsed "Store Results" button since we won't be using it for Twins Day -->
+                                <Button Visibility="Collapsed" Name="VerificationStore" Content="Store Results" IsEnabled="False" Height="55" Margin="2.5" FontSize="18"/>
+
+                                <!-- Clear Buttons -->
+                                <StackPanel Orientation ="Horizontal" HorizontalAlignment="Center" Height="45">
+                                    <Button Name="VerificationClearTop" Click="VerificationClearTop_Click" Margin="2.5" Width="50" IsEnabled="False">
+                                        <TextBlock TextAlignment="Center">Clear<LineBreak/>Top</TextBlock>
+                                    </Button>
+                                    <Button Name="VerificationClearBottom" Click="VerificationClearBottom_Click" Margin="2.5" Width="50" IsEnabled="False">
+                                        <TextBlock TextAlignment="Center">Clear<LineBreak/>Bottom</TextBlock>
+                                    </Button>
+                                    <Button Name="VerificationClear" Click="VerificationClear_Click" IsEnabled="False" Margin="2.5" Width="50">
+                                        <TextBlock TextAlignment="Center">Clear<LineBreak/>Both</TextBlock>
+                                    </Button>
+                                    <Button Name="VerificationReset" Content="Reset" Click="VerificationReset_Click" IsEnabled="False" Margin="2.5" Width="50"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- The Results Display Area -->
+                            <Border BorderBrush="#6E6259" BorderThickness="2" Margin="0,3">
+                                <DockPanel LastChildFill="True">
+                                    <Label Content="Results:" DockPanel.Dock="Top" Background="#D0D4D6"
+                                       FontSize="16" FontWeight="Black" FontStyle="Italic"/>
+                                    <TextBox Name ="VerifyResults" FontSize="16" Background="GhostWhite"
+                                             TextWrapping="Wrap" IsReadOnlyCaretVisible="True" IsReadOnly="True"
+                                             ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+                                </DockPanel>
+                            </Border>
+                        </DockPanel>
+                    </Grid>
+                </Border>
+            </TabItem>
+            <!-- END OF VERIFICATION (1:1) SECTION -->
+
+
+            <!-- START OF VERIFICATION (1:N) SECTION -->
+            <TabItem Margin="0,2.5" Height="50" x:Name="VerifyNTab">
+                <TabItem.Header>
+                    <Label Content="Verify 1:N"/>
+                </TabItem.Header>
+
+                <Border Margin="-5" BorderThickness="3" BorderBrush="#2C2A29" Background="#002855">
+                    <Grid Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <DockPanel Grid.Column="0" >
+
+                            <!-- The Bottom Button Section -->
+                            <DockPanel DockPanel.Dock="Bottom" Background="#325276">
+                                <!-- Clear and Reset Buttons -->
+                                <StackPanel Orientation="Horizontal" Height="40" HorizontalAlignment="Center" DockPanel.Dock="Bottom" Margin="0,0,0,5">
+                                    <Button Name="VerifySubject_Clear" Content="Clear" Click="VerifyNClear_Click" Width="80" Margin="0,0,5,0" FontSize="16" IsEnabled="False"/>
+                                    <Button Name="VerifySubject_Reset" Content="Reset" Click="VerifyNReset_Click" Width="80" Margin="5,0,0,0" FontSize="16" IsEnabled="False"/>
+                                </StackPanel>
+
+                                <!-- Main Verification Button -->
+                                <Button DockPanel.Dock="Top" Name="VerifySubjectVoice" Content="Verify" Click="VerifyN_Click" Height="53" Margin="3" FontSize="18" IsEnabled="False"/>
+                            </DockPanel>
+
+                            <!-- Audio Player and File Import/Scan -->
+                            <DockPanel DockPanel.Dock="Top">
+                                <!-- The Top Audio File Import -->
+                                <Border DockPanel.Dock="Top" BorderThickness="2" BorderBrush="#6E6259">
+                                    <Grid Background="LightGray">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- The Left Image File Import -->
+                                        <DockPanel Grid.Row="2" LastChildFill="True">
+                                            <Button Name="VerifyImport" Click="VerifyImport_Click" DockPanel.Dock="Right" Height="30" Width="100" Margin="3">
+                                                <Image Height="24">
+                                                    <Image.Source>
+                                                        <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/FolderPlus.png"/>
+                                                    </Image.Source>
+                                                </Image>
+                                            </Button>
+                                            <TextBox Name="VerifyImportPath" Margin="3" VerticalContentAlignment="Center"/>
+                                        </DockPanel>
+
+                                        <DockPanel Grid.Row="0" LastChildFill="True">
+                                            <Button Name ="VerifyScan" Content="Scan" Click="VerifyScan_Click" Width="100" Height="28"  Margin="3" VerticalAlignment="Top" DockPanel.Dock="Right"/>
+                                            <TextBox Name ="VerifyScanPath" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="28"  Margin="3" KeyDown="VerifyScanPath_KeyDown"/>
+                                        </DockPanel>
+
+                                        <DockPanel Grid.Row="1">
+                                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                                                <Button Name="VerifySelect" Content="Select" Click="VerifySelect_Click" Width="60" Height="25" Margin="3" IsEnabled="False"/>
+                                                <Button Name="VerifyDeselect" Content="Deselect" Click="VerifyDeselect_Click" Width="60" Height="25" Margin="3" IsEnabled="False"/>
+                                            </StackPanel>
+
+                                            <ComboBox Name="VerifyVoiceSelect" Text="Select Voice..." Margin="3" IsEnabled="False" SelectionChanged="VerifyVoiceSelect_SelectionChanged"/>
+                                        </DockPanel>
+                                    </Grid>
+                                </Border>
+
+                                <Border BorderThickness="2,0,2,2" BorderBrush="#6E6259">
+                                    <Grid Background="#807F7E">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Top Audio Player -->
+                                        <DockPanel Grid.Row="0" Background="#565453" VerticalAlignment="Center">
+
+                                            <Label Name="VerifyRID" Content="---" FontSize="16" DockPanel.Dock="Top" HorizontalContentAlignment="Center" Foreground="LightGray"/>
+                                            <Label Name="VerifyPlayerStatus" Content="No File Loaded" FontSize="16" FontStyle="Italic" DockPanel.Dock="Top" HorizontalContentAlignment="Center" Foreground="LightGray"/>
+
+                                            <!-- The Playback Controls -->
+                                            <WrapPanel HorizontalAlignment="Center" DockPanel.Dock="Bottom" Margin="0,0,0,10">
+                                                <Button Name="VerifyPlay" Width="52" Height="35" Click="VerifyPlay_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Play.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                                <Button Name="VerifyPause" Margin="10,0" Width="55" Height="35" Click="VerifyPause_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Pause.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                                <Button Name="VerifyStop" Width="51" Height="35" Click="VerifyStop_Click">
+                                                    <Image Height="24">
+                                                        <Image.Source>
+                                                            <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Stop.png"/>
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Button>
+                                            </WrapPanel>
+
+                                            <Slider Name="VerifyTime" Margin="10,5" Thumb.DragStarted="VerifyTime_DragStarted" Thumb.DragCompleted="VerifyTime_DragCompleted"/>
+                                        </DockPanel>
+                                    </Grid>
+                                </Border>
+                            </DockPanel>
+                        </DockPanel>
+
+                        <!-- Result Panel/Store Results Button (Progress Bar?) -->
+                        <DockPanel Grid.Column="1" Margin="15,0,0,0">
+                            <!-- Collapsed the "store Results" button since we wont be using it for Twins Day -->
+                            <Button Visibility="Collapsed" DockPanel.Dock="Bottom" Name="VerifyStoreResult" Content="Store Results" Height="55" Margin="10" FontSize="16" IsEnabled="False"/>
+
+                            <!-- The Results -->
+                            <Border DockPanel.Dock="Top" Margin="3,10,3,0" Background="#D0D4D6" BorderThickness="2" BorderBrush="#6E6259">
+                                <Label Content="Results:" Margin="0,3" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold" FontStyle="Italic"/>
+                            </Border>
+
+                            <TextBox Name ="VerifyN_Results" FontSize="16" Background="GhostWhite" Margin="3" BorderBrush="#6E6259" BorderThickness="2"
+                                 ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                 TextWrapping="Wrap" IsReadOnlyCaretVisible="True" IsReadOnly="True"/>
+                        </DockPanel>
+                    </Grid>
+                </Border>
+            </TabItem>
+            <!-- END OF VERIFICATION (1:N) SECTION -->
+
+
+            <!-- START OF TEMPLATE SECTION -->
+            <TabItem Margin="0,2.5" Height="50" x:Name="TemplateTab">
+                <TabItem.Header>
+                    <Label Content="Generate Templates"/>
+                </TabItem.Header>
+
+                <!-- All the Content in the Template Page -->
+                <Border Margin="-5" BorderThickness="3" BorderBrush="#2C2A29" Background="#002855">
+                    <DockPanel Margin="4">
+                        <DockPanel DockPanel.Dock="Bottom">
+
+                            <Grid DockPanel.Dock="Right" Background="#325276">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="50"/>
+                                    <RowDefinition Height="35"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Buttons on the Bottom of the Page -->
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Button Name="GenerateAll" Content="Generate All Templates" Width="138" Height="40" Click="GenerateAll_Click" Margin="5,5,2.5,2.5"/>
+                                    <Button Name ="GenerateSelected" Content="Generate Selected Templates" Width="173" Height="40" Click="GenerateSelected_Click" Margin="2.5,5,5,2.5"/>
+                                </StackPanel>
+                                <Button Name="CancelTemplate" Grid.Row="1" Content="Cancel" Click="CancelTemplate_Click" IsEnabled="False" Margin="5,2.5,5,5"/>
+                            </Grid>
+
+
+                            <!-- The Progress Bar -->
+                            <Grid DockPanel.Dock="Left" Margin="20,5">
+                                <DockPanel>
+                                    <TextBox Name="TemplateStatusInfo" DockPanel.Dock="Bottom" Text="Progress: " Height="25"
+                                             VerticalContentAlignment="Center" IsReadOnlyCaretVisible="False" IsReadOnly="True"
+                                             FontWeight="Black" FontStyle="Italic" Background="GhostWhite"/>
+                                    <ProgressBar Name="TemplateStatus" Minimum="0" Maximum="100" Value="0" Height="40"/>
+                                </DockPanel>
+                            </Grid>
+                        </DockPanel>
+
+                        <!-- The Main Label Above the ListBox -->
+                        <DockPanel DockPanel.Dock="Top" Background="#A2AAAD" >
+                            <Label DockPanel.Dock="Bottom" Margin="4" FontWeight="Bold" FontStyle="Italic" Content="Select directories to be searched:"/>
+                            <Border Background="Gainsboro" BorderThickness="1" BorderBrush="#B0B0B0" Margin="10,10,10,0">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="2" ShadowDepth="2" Color="DarkGray"/>
+                                </Border.Effect>
+                                <StackPanel Margin="5">
+                                    <TextBlock FontSize="14" FontWeight="SemiBold" FontStyle="Italic" Margin="5">Please Note:</TextBlock>
+                                    <TextBlock FontSize="14" TextWrapping="Wrap" Margin="5">
+                                    Template generation will traverse through selected directories to record subject information
+                                    and generate a biometric template for that given subject. When evaluating selected directories,
+                                    only subjects and data within those directories will be re-evaluated. Template data is used
+                                    for identification, so any subjects that have not yet been evaluated will be omitted during
+                                    the enrollment phase of the identification process.
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+                        </DockPanel>
+
+                        <!-- The Main ListBox -->
+                        <ListBox Name="DatabaseDisplay" SelectionMode="Multiple" BorderBrush="#6E6259" BorderThickness="2" Background="GhostWhite"
+                                 Margin="0,4" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+
+                    </DockPanel>
+                </Border>
+            </TabItem>
+            <!-- END OF TEMPLATE SECTION -->
+
+            <!-- START OF SETTINGS SECTION -->
+            <TabItem Margin="0,2.5" Height="50" x:Name="SettingsTab">
+                <TabItem.Header>
+                    <Label Content="Settings"/>
+                </TabItem.Header>
+
+                <!-- All the Content in the Settings Page -->
+                <Border Margin="-5" BorderThickness="3" BorderBrush="#2C2A29" Background="#002855">
+                    <DockPanel Margin="4">
+
+                        <!-- Bottom Setting Buttons -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Height="36" Background="#325276">
+                            <Button Name = "ApplySetting" Content="Apply" Width="90" Margin="2.5,0" Click="ApplySettings" IsEnabled="False"/>
+                            <Button Name = "CancelSetting" Content="Cancel" Width="90" Margin="2.5,0" Click="CancelSettings" IsEnabled="False"/>
+                            <Button Name = "RevertSetting" Content="Revert" Width="90" Margin="2.5,0" Click="RevertSettings" IsEnabled="False"/>
+                            <Button Name = "DefaultSetting" Content="Default" Width="90" Margin="2.5,0" Click="RestoreDefaultSettings" IsEnabled="False"/>
+                        </StackPanel>
+
+                        <!-- Top Setting Elements -->
+                        <Border DockPanel.Dock="Top">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="2" ShadowDepth="5" />
+                            </Border.Effect>
+                            <DockPanel Background="#A2AAAD">
+
+                                <Border DockPanel.Dock="Top" Margin="8" Background="Gainsboro" BorderThickness="1" BorderBrush="#B0B0B0">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="2" ShadowDepth="2" Color="DarkGray"/>
+                                    </Border.Effect>
+                                    <StackPanel>
+                                        <TextBlock FontSize="14" FontWeight="SemiBold" FontStyle="Italic" Margin="5">Please Note:</TextBlock>
+                                        <TextBlock FontSize="14" TextWrapping="Wrap" Margin="5">
+                                    When changing any settings or adding/removing directories, make sure to apply them or your changes
+                                    will not be retained. If, for some reason, you accidentally apply an unwanted change, you can select
+                                    the Revert button to return back to the previously applied settings.
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+
+                                <DockPanel DockPanel.Dock="Bottom" Margin="0,7.5,0,5">
+
+                                    <!-- The Twins Day 2017 Server Button and Label -->
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                                        <Label Content="Set TWD Server and Data:" VerticalAlignment="Center" FontWeight="Black" FontStyle="Italic" Cursor="Help"
+                                           ToolTipService.InitialShowDelay="1000" ToolTipService.ShowDuration="10000"
+                                           ToolTipService.BetweenShowDelay="2000" ToolTipService.IsEnabled="True">
+                                            <Label.ToolTip>
+                                                <ToolTip  Width="350">
+                                                    <StackPanel>
+                                                        <TextBlock FontWeight="Bold">Twins Day 2017 Server</TextBlock>
+                                                        <TextBlock TextWrapping="Wrap">
+                                                            Creates a dialog box to set both the Twins Day server and Data folder location. When the dialog box opens, it will already display the currently set server and data folder addesses. Please note that the address entered should correspond to the root address of the server,
+                                                            not the address to a modality folder. For the Data folder, make sure to also set it to the root folder and not to any of the subfolders.\n\nAdditionally, when setting an address path, the window will display the current connectivity state. So if it was unable to connect
+                                                            to the specified address, it will be red. If it could connect, then it would be green
+                                                            <LineBreak/>
+                                                            <LineBreak/>
+                                                            The server set will correspond to image/voice aquisition for both template processing and for demo purposes, such as obtaining probe faces/voices for a specific RID.
+                                                        </TextBlock>
+                                                    </StackPanel>
+                                                </ToolTip>
+                                            </Label.ToolTip>
+                                        </Label>
+
+                                        <Button Name="SetServerData" Click="SetServerData_Click" Width="45" Margin="10,0">
+                                            <Image Height="24">
+                                                <Image.Source>
+                                                    <BitmapImage DecodePixelHeight="24" UriSource="/Icon Images/Normal/Gear.png"/>
+                                                </Image.Source>
+                                            </Image>
+                                        </Button>
+                                    </StackPanel>
+
+                                    <!-- Add / Remove / Clear Database Buttons -->
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+
+                                        <!-- Database Label -->
+                                        <Label Content="Directories to Match Against:" VerticalAlignment="Center" FontWeight="Black" FontStyle="Italic" Cursor="Help"
+                                           ToolTipService.InitialShowDelay="1000" ToolTipService.ShowDuration="10000"
+                                           ToolTipService.BetweenShowDelay="2000" ToolTipService.IsEnabled="True">
+                                            <Label.ToolTip>
+                                                <ToolTip  Width="350">
+                                                    <StackPanel>
+                                                        <TextBlock FontWeight="Bold">Directories/Networks</TextBlock>
+                                                        <TextBlock TextWrapping="Wrap">
+                                                The list of directories used to search for and record subjects when generating
+                                                templates. If there is a directory or network path that is not present, you can
+                                                search through folder structures (Add Directory) or add a network by addesss
+                                                (Add Network/Server).
+                                                <LineBreak/>
+                                                <LineBreak/>
+                                                Please note that directory and network paths should point to the folders which
+                                                contain all of the RID folders. If this is not the case, it may cause errors
+                                                during the template process.
+                                                        </TextBlock>
+                                                    </StackPanel>
+                                                </ToolTip>
+                                            </Label.ToolTip>
+                                        </Label>
+
+                                        <!-- Buttons -->
+                                        <Button Name="AddDirectory" Content="Add Directory" Height="32" Width="105" Margin="2.5,0" Click="AddDirectory_Click"/>
+                                        <Button Name="AddNetworkDrive" Content="Add Network/Server" Width="148" Margin="2.5,0" Click="AddNetworkDrive_Click"/>
+                                        <Button Name="RemoveDatabase" Content="Remove Selected" Height="32" Width="130" Margin="2.5,0" Click="RemoveDatabase_Click" />
+                                        <Button Name="ClearDatabase" Content="Clear All" Height="32" Width="70" Margin="2.5,0" Click="ClearDatabases_Click"/>
+                                    </StackPanel>
+                                </DockPanel>
+
+                                <!-- Top Settings Options (# Matches/FAR/Threshold) -->
+                                <StackPanel Orientation="Horizontal" Margin="0,5,0,7.5">
+
+                                    <!-- Top Matches -->
+                                    <Label Content="Number of Top Matches to Display:" Margin="2" FontWeight="Black" FontStyle="Italic" Cursor="Help"
+                                       ToolTipService.InitialShowDelay="1000" ToolTipService.ShowDuration="10000"
+                                       ToolTipService.BetweenShowDelay="2000" ToolTipService.IsEnabled="True">
+                                        <Label.ToolTip>
+                                            <ToolTip Width="350">
+                                                <StackPanel>
+                                                    <TextBlock FontWeight="Bold">Top Matches</TextBlock>
+                                                    <TextBlock TextWrapping="Wrap">
+                                                The top matches will set the maximum possible results returned during the
+                                                identification process. However, if there are fewer matches than the maximum,
+                                                only those top matches will be displayed.
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </ToolTip>
+                                        </Label.ToolTip>
+                                    </Label>
+                                    <ComboBox Name="NumOfMatches" IsEditable="True" IsTextSearchEnabled="False" Width="60" Margin ="2"
+                                          TextBoxBase.TextChanged="NumOfMatches_TextChanged" KeyDown="Settings_KeyDown" VerticalContentAlignment="Center"/>
+
+                                    <!-- FAR/False Acceptance Rate -->
+                                    <Label Content="Matching False Acceptance Rate ( % ): " Margin="5,2,2,2" FontWeight="Black" FontStyle="Italic" Cursor="Help"
+                                       ToolTipService.InitialShowDelay="1000" ToolTipService.ShowDuration="10000"
+                                       ToolTipService.BetweenShowDelay="2000" ToolTipService.IsEnabled="True">
+                                        <Label.ToolTip>
+                                            <ToolTip  Width="350">
+                                                <StackPanel>
+                                                    <TextBlock FontWeight="Bold">False Acceptance Rate (FAR)</TextBlock>
+                                                    <TextBlock TextWrapping="Wrap">
+                                                FAR is the percent likelihood that an incorrect match will be accepted as a
+                                                match. So if FAR is set larger, then it will be more likely that a false match
+                                                will be made.
+                                                <LineBreak/>
+                                                <LineBreak/>
+                                                The FAR is related to the matching threshold. So the higher the FAR is, the lower
+                                                the matching score/threshold will be, and vice versa. To finalize any changes,
+                                                either press enter or click outside the control.
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </ToolTip>
+                                        </Label.ToolTip>
+                                    </Label>
+                                    <ComboBox Name="setMatchFAR" IsEditable="True" IsTextSearchEnabled="False" Width="100" Margin ="2"
+                                          GotFocus="setMatchFAR_GotFocus" GotKeyboardFocus="setMatchFAR_GotFocus"
+                                          LostFocus="setMatchFAR_LostFocus" LostKeyboardFocus="setMatchFAR_LostFocus"
+                                          KeyDown="Settings_KeyDown" VerticalContentAlignment="Center"/>
+
+                                    <!-- Matching Threshold/Score -->
+                                    <Label Content="Matching Threshold ( Score ): " Margin="5,2,2,2" FontWeight="Black" FontStyle="Italic" Cursor="Help"
+                                       ToolTipService.InitialShowDelay="1000" ToolTipService.ShowDuration="10000"
+                                       ToolTipService.BetweenShowDelay="2000" ToolTipService.IsEnabled="True">
+                                        <Label.ToolTip>
+                                            <ToolTip  Width="350">
+                                                <StackPanel>
+                                                    <TextBlock FontWeight="Bold">Threshold</TextBlock>
+                                                    <TextBlock TextWrapping="Wrap">
+                                                The matching score/threshold is the minimum score that both identification
+                                                and verification functions use to assume that a subject is a match. Any
+                                                comparisons that return a comparison score that is below the threshold, the
+                                                resulting score will be set to zero.
+                                                <LineBreak/>
+                                                <LineBreak/>
+                                                The threshold is related to the FAR. So the higher the score, the lower the
+                                                FAR, and vice versa. To finalize any changes, either press enter
+                                                or click outside the control.
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </ToolTip>
+                                        </Label.ToolTip>
+                                    </Label>
+                                    <TextBox Name="setThreshold" Width="75" Margin ="2" PreviewTextInput="setThreshold_PreviewTextInput"
+                                         GotFocus="setThreshold_GotFocus" GotKeyboardFocus="setThreshold_GotFocus"
+                                         LostFocus="setThreshold_LostFocus" LostKeyboardFocus="setThreshold_LostFocus"
+                                         KeyDown="Settings_KeyDown" VerticalContentAlignment="Center"/>
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+
+                        <!-- Directory/Network Display List(s) -->
+                        <Grid Margin="0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- The Status Buttons -->
+                            <ListBox Grid.Column="0" Name="DBStatusList" ItemsSource="{Binding Path=Items, ElementName=DatabaseDisplayList}" ScrollViewer.CanContentScroll="True"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.ScrollChanged="DBStatusList_ScrollChanged"
+                                     BorderThickness="2,2,1,2" BorderBrush="#6E6259" Background="GhostWhite">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Tag="{Binding Mode=OneWay}" Loaded="StatusButton_Load" Click="StatusButton_Click"
+                                                Width="25" Height="25" Background="LightSkyBlue" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                            <Image Width="16" Height="16">
+                                                <Image.Source>
+                                                    <!--<BitmapImage DecodePixelWidth="16" UriSource="/Icon Images/Small/Refresh.png" />-->
+                                                    <BitmapImage UriSource="/Icon Images/Small/Refresh.png" />
+                                                </Image.Source>
+                                            </Image>
+                                        </Button>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Focusable" Value="False"/>
+                                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        <Setter Property="Height" Value="30"/>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                            </ListBox>
+
+                            <!-- The Main ListBox -->
+                            <ListBox Grid.Column="1" Name="DatabaseDisplayList" SelectionMode="Multiple" BorderThickness="0,2,2,2" BorderBrush="#6E6259" Background="GhostWhite"
+                                     ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.ScrollChanged="DatabaseDisplayList_ScrollChanged">
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Height" Value="30"/>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                            </ListBox>
+                        </Grid>
+
+                    </DockPanel>
+                </Border>
+            </TabItem>
+            <!-- END OF SETTINGS SECTION -->
+
+            <!-- START OF LOG SECTION -->
+            <TabItem Margin="0,2.5" Height="50" x:Name="LogTab">
+                <TabItem.Header>
+                    <Label Content="Logs" />
+                </TabItem.Header>
+
+                <Border Margin="-5" BorderThickness="3" BorderBrush="#2C2A29" Background="#002855">
+                    <!-- The Log TextBox -->
+                    <TextBox Name="LogText" Margin="10" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible"
+                             TextWrapping="Wrap" IsReadOnlyCaretVisible="True" IsReadOnly="True" Background="GhostWhite"
+                             BorderBrush="#6E6259" BorderThickness="2"/>
+                </Border>
+            </TabItem>
+            <!-- END OF LOG SECTION -->
+
+            
+        </TabControl>
+    </Grid>
+</Window>
